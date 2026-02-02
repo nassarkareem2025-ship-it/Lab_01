@@ -11,7 +11,6 @@ public class ProductGenerator {
     public static void main(String[] args)
     {
 
-
         String ID = "";
         String productName = "";
         String Desc = "";
@@ -21,62 +20,43 @@ public class ProductGenerator {
 
         Scanner in = new Scanner(System.in);
 
-        ArrayList<String> recs = new ArrayList<>();
-
+        ArrayList<Product> Products = new ArrayList<>();
 
         do {
 
 
-            // get the five data fields
 
             ID = SafeInput.getNonZeroLenString(in, "Enter the ID");
             productName = SafeInput.getNonZeroLenString(in, "Enter the product name");
             Desc = SafeInput.getNonZeroLenString(in, "Enter the description");
-            cost = SafeInput.getRangedDouble(in, "Enter the cost: ", 100, 9999);
+            cost = SafeInput.getRangedDouble(in, "Enter the cost of the product ", 10, 9999);
 
 
-            // combine them into a single csv record
-            csvRec = ID + ", " + productName + ", " + Desc + ", " + cost;
+            Product e = new Product(ID, productName, Desc, cost);
 
-            // add it to the ArrayList
-            recs.add(csvRec);
+            Products.add(e);
 
-            // Prompt user for additional records
             done = SafeInput.getYNConfirm(in, "Are you done");
         }while(!done);
 
-        // Add the code to save the data to disk
 
-        // uses a fixed known path:
-        //  Path file = Paths.get("c:\\My Documents\\data.txt");
-
-        // use the toolkit to get the current working directory of the IDE
-        // will create the file within the Netbeans project src folder
-        // (may need to adjust for other IDE)
-        // Not sure if the toolkit is thread safe...
         File workingDirectory = new File(System.getProperty("user.dir"));
-        Path file = Paths.get(workingDirectory.getPath() + "\\src\\productdata.txt");
+        Path file = Paths.get(workingDirectory.getPath() + "\\src\\Productdata.txt");
 
         try
         {
-            // Typical java pattern of inherited classes
-            // we wrap a BufferedWriter around a lower level BufferedOutputStream
             OutputStream out =
                     new BufferedOutputStream(Files.newOutputStream(file, CREATE));
             BufferedWriter writer =
                     new BufferedWriter(new OutputStreamWriter(out));
 
-            // Finally can write the file LOL!
 
-            for(String rec : recs)
+            for(Product e : Products)
             {
-                writer.write(rec, 0, rec.length());  // stupid syntax for write rec
-                // 0 is where to start (1st char) the write
-                // rec. length() is how many chars to write (all)
-                writer.newLine();  // adds the new line
-
+                writer.write(e.toCSVRecord());
+                writer.newLine();
             }
-            writer.close(); // must close the file to seal it and flush buffer
+            writer.close();
             System.out.println("Data file written!");
         }
         catch (IOException e)
@@ -84,11 +64,7 @@ public class ProductGenerator {
             e.printStackTrace();
         }
 
-        // Dumpt the array list for inspedction
-//        for(String rec : recs)
-//        {
-//            System.out.println(rec);
-//        }
+
 
     }
 }
