@@ -8,15 +8,13 @@ import static java.nio.file.StandardOpenOption.CREATE;
 
 public class ProductReader {
     public static void main(String[] args) {
-
-        String ID = "";
-        String Name = "";
+        String id = "";
+        String pName = "";
         String Desc = "";
-        Double Cost = 0.0;
-
+        Double cost = (double) 0;
         final int FIELDS_LENGTH = 4;
 
-        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<Product> Products = new ArrayList<>();
 
         File workingDirectory = new File(System.getProperty("user.dir"));
         JFileChooser chooser = new JFileChooser();
@@ -32,44 +30,49 @@ public class ProductReader {
                 Path file = selectedFile.toPath();
                 InputStream in = new BufferedInputStream(Files.newInputStream(file, CREATE));
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
                 int line = 0;
-                while (reader.ready()) {
+                while(reader.ready())
+                {
                     String rec = reader.readLine();
-                    lines.add(rec);
                     line++;
-                    System.out.printf("\nLine %4d %-60s", line, rec);
-                }
-                reader.close();
 
-                System.out.println("\n\nData file read!");
+                    String[] fields = rec.split(",");
 
-                String[] fields;
-
-                System.out.printf("%-8s%-20s%-25s%s",
-                        "ID", "Name", "Description", "Cost");
-                System.out.println("\n==============================================================");
-
-                for (String l : lines) {
-                    fields = l.split(",");
-
-                    if (fields.length == FIELDS_LENGTH) {
-                        ID = fields[0].trim();
-                        Name = fields[1].trim();
+                    if(fields.length == FIELDS_LENGTH){
+                        id = fields[0].trim();
+                        pName = fields[1].trim();
                         Desc = fields[2].trim();
-                        Cost = Double.parseDouble(fields[3].trim());
+                        cost = Double.parseDouble(fields[3].trim());
 
-                        System.out.printf("\n%-8s%-20s%-25s%.2f",
-                                ID, Name, Desc, Cost);
-                    } else {
-                        System.out.println("\nFound a record that may be corrupt:");
-                        System.out.println(l);
+                        Product e = new Product(id,pName, Desc, cost);
+                        Products.add(e);
+                    }
+                    else {
+                        System.out.println("Found a record that may be corrupt: ");
+                        System.out.println(rec);
                     }
                 }
+                reader.close();
+                System.out.println("\n\nData file read!");
+                System.out.printf("%-8s%-15s%-15s%-10.2s","ID#","ProductName","Description","Cost");
+                System.out.println("\n==============================================");
 
+                for(Product e :Products){
+                    System.out.printf("\n%-8s%-15s%-15s%-10.2f",
+                            e.getID(),
+                            e.getName(),
+                            e.getDescription(),
+                            e.getCost());
+                }
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+        else{
+
+        }
+
     }
 }
